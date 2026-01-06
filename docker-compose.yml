@@ -1,0 +1,26 @@
+services:
+  ipinfo-api:
+    build: .
+    container_name: ipinfo-memory-api
+    restart: unless-stopped
+
+    ports:
+      - "9000:9000"
+
+    environment:
+      APP_IPINFO_TOKEN: "${IPINFO_TOKEN}"
+      # APP_IPINFO_REFRESH_INTERVAL: 24h
+      # APP_IPINFO_DOWNLOAD_TIMEOUT: 30s
+
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:8080/healthz"]
+      interval: 30s
+      timeout: 2s
+      retries: 3
+
+    deploy:
+      resources:
+        limits:
+          memory: 6g
+        reservations:
+          memory: 3g

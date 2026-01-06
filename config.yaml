@@ -1,0 +1,9 @@
+server:
+  listen: ":8090"
+  shutdown_timeout: 10s
+
+ipinfo:
+  dump_url: "https://ipinfo.io/data/ipinfo_lite.csv.gz"
+  token: ""
+  refresh_interval: 24h
+  download_timeout: 30s
