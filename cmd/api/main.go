@@ -6,10 +6,10 @@ import (
 	"net/http"
 	"time"
 
-	"ipinfo-memory-api/internal/config"
-	"ipinfo-memory-api/internal/dataset"
-	"ipinfo-memory-api/internal/handler"
-	"ipinfo-memory-api/internal/server"
+	"ipinfo-api/internal/config"
+	"ipinfo-api/internal/dataset"
+	"ipinfo-api/internal/handler"
+	"ipinfo-api/internal/server"
 )
 
 func main() {
@@ -20,39 +20,53 @@ func main() {
 
 	store := dataset.NewStore()
 
-	reload := func(ctx context.Context) error {
+	reloadFromRemote := func(ctx context.Context) error {
 		ctx, cancel := context.WithTimeout(ctx, cfg.IPInfo.DownloadTimeout)
 		defer cancel()
 
-		data, err := dataset.Download(ctx, cfg.IPInfo.DumpURL, cfg.IPInfo.Token)
-		if err != nil {
+		if err := dataset.DownloadToFile(
+			ctx,
+			cfg.IPInfo.DumpURL,
+			cfg.IPInfo.Token,
+			cfg.IPInfo.CacheFile,
+		); err != nil {
 			return err
 		}
 
-		v4, v6, err := dataset.ParseCSV(data)
+		v4, v6, err := dataset.LoadFromFile(cfg.IPInfo.CacheFile)
 		if err != nil {
 			return err
 		}
 
 		store.Load(v4, v6)
-		log.Printf("dataset loaded: v4=%d v6=%d", len(v4), len(v6))
+		log.Printf("dataset loaded from remote: v4=%d v6=%d", len(v4), len(v6))
 		return nil
 	}
 
-	if err := reload(context.Background()); err != nil {
-		log.Fatal("initial load failed:", err)
+	if dataset.CacheFresh(cfg.IPInfo.CacheFile, cfg.IPInfo.RefreshInterval) {
+		log.Println("using cached dataset from disk")
+		if v4, v6, err := dataset.LoadFromFile(cfg.IPInfo.CacheFile); err == nil {
+			store.Load(v4, v6)
+		}
+	}
+
+	if !store.Ready() {
+		log.Println("no valid cache found, downloading dataset")
+		if err := reloadFromRemote(context.Background()); err != nil {
+			log.Fatal(err)
+		}
 	}
 
 	go func() {
 		t := time.NewTicker(cfg.IPInfo.RefreshInterval)
 		for range t.C {
-			_ = reload(context.Background())
+			_ = reloadFromRemote(context.Background())
 		}
 	}()
 
 	mux := http.NewServeMux()
 	mux.HandleFunc("/ip/", handler.IP(store))
-	mux.HandleFunc("/reload", handler.Reload(reload))
+	mux.HandleFunc("/reload", handler.Reload(reloadFromRemote))
 	mux.HandleFunc("/healthz", handler.Health())
 	mux.HandleFunc("/readyz", handler.Ready(store))
 
@@ -62,6 +76,6 @@ func main() {
 	}
 
 	server.Run(srv, cfg.Server.ShutdownTimeout, func() {
-		_ = reload(context.Background())
+		_ = reloadFromRemote(context.Background())
 	})
 }

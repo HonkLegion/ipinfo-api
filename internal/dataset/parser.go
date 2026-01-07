@@ -27,14 +27,14 @@ func ParseCSV(data []byte) ([]IPv4Range, []IPv6Range, error) {
 		}
 
 		meta := Meta{
-			Network:       row[0],
-			Country:       row[1],
-			CountryCode:   row[2],
-			Continent:     row[3],
-			ContinentCode: row[4],
-			ASN:           row[5],
-			ASName:        row[6],
-			ASDomain:      row[7],
+			Network:        row[0],
+			Country:        row[1],
+			CountryCode:    row[2],
+			Continent:      row[3],
+			ContinentCode:  row[4],
+			ASN:            row[5],
+			ASName:         row[6],
+			ASDomain:       row[7],
 		}
 
 		if netw.IP.To4() != nil {
@@ -60,9 +60,11 @@ func ParseCSV(data []byte) ([]IPv4Range, []IPv6Range, error) {
 			}
 
 			v6 = append(v6, IPv6Range{
-				StartHi: startHi, StartLo: startLo,
-				EndHi: endHi, EndLo: endLo,
-				Meta: meta,
+				StartHi: startHi,
+				StartLo: startLo,
+				EndHi:   endHi,
+				EndLo:   endLo,
+				Meta:    meta,
 			})
 		}
 	}

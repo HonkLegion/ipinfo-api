@@ -8,14 +8,14 @@ import (
 )
 
 type Meta struct {
-	Network       string `json:"network"`
-	Country       string `json:"country"`
-	CountryCode   string `json:"country_code"`
-	Continent     string `json:"continent"`
-	ContinentCode string `json:"continent_code"`
-	ASN           string `json:"asn,omitempty"`
-	ASName        string `json:"as_name,omitempty"`
-	ASDomain      string `json:"as_domain,omitempty"`
+	Network        string `json:"network"`
+	Country        string `json:"country"`
+	CountryCode    string `json:"country_code"`
+	Continent      string `json:"continent"`
+	ContinentCode  string `json:"continent_code"`
+	ASN            string `json:"asn,omitempty"`
+	ASName         string `json:"as_name,omitempty"`
+	ASDomain       string `json:"as_domain,omitempty"`
 }
 
 type IPv4Range struct {
@@ -33,10 +33,9 @@ type IPv6Range struct {
 }
 
 type Store struct {
-	v4 atomic.Value // []IPv4Range
-	v6 atomic.Value // []IPv6Range
-
-	ready atomic.Bool // bool
+	v4    atomic.Value // []IPv4Range
+	v6    atomic.Value // []IPv6Range
+	ready atomic.Bool
 }
 
 func NewStore() *Store {

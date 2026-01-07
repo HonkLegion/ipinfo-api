@@ -1,4 +1,4 @@
-module ipinfo-memory-api
+module ipinfo-api
 
 go 1.25.5
 

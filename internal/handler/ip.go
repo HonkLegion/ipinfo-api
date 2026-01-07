@@ -6,7 +6,7 @@ import (
 	"net/http"
 	"strings"
 
-	"ipinfo-memory-api/internal/dataset"
+	"ipinfo-api/internal/dataset"
 )
 
 func IP(store *dataset.Store) http.HandlerFunc {
@@ -14,7 +14,7 @@ func IP(store *dataset.Store) http.HandlerFunc {
 		ipStr := strings.TrimPrefix(r.URL.Path, "/ip/")
 		ip := net.ParseIP(ipStr)
 		if ip == nil {
-			http.Error(w, "invalid ip", 400)
+			http.Error(w, "invalid ip", http.StatusBadRequest)
 			return
 		}
 

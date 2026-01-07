@@ -3,7 +3,7 @@ package handler
 import (
 	"net/http"
 
-	"ipinfo-memory-api/internal/dataset"
+	"ipinfo-api/internal/dataset"
 )
 
 func Health() http.HandlerFunc {

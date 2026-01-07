@@ -24,7 +24,7 @@ func Run(srv *http.Server, shutdown time.Duration, reload func()) {
 	for {
 		s := <-sig
 		if s == syscall.SIGHUP {
-			log.Println("hot reload triggered (SIGHUP)")
+			log.Println("hot reload triggered")
 			reload()
 			continue
 		}

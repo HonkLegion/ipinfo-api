@@ -18,6 +18,7 @@ type Config struct {
 		Token           string        `yaml:"token"`
 		RefreshInterval time.Duration `yaml:"refresh_interval"`
 		DownloadTimeout time.Duration `yaml:"download_timeout"`
+		CacheFile       string        `yaml:"cache_file"`
 	} `yaml:"ipinfo"`
 }
 

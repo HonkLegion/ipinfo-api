@@ -7,6 +7,9 @@ services:
     ports:
       - "9000:9000"
 
+    volumes:
+      - "./data:/app/data"
+
     environment:
       APP_IPINFO_TOKEN: "${IPINFO_TOKEN}"
       # APP_IPINFO_REFRESH_INTERVAL: 24h
