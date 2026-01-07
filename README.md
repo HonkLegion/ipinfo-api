@@ -115,8 +115,8 @@ ipinfo:
   download_timeout: 60s
   cache_file: "./data/ipinfo.csv"
 ```
-### Environment Overrides
 
+### Environment Overrides
 
 The IPInfo token can be provided via environment variable:
 
@@ -124,12 +124,9 @@ The IPInfo token can be provided via environment variable:
 APP_IPINFO_TOKEN=your_token_here
 ```
 
-💻 Running Locally
-Requirements
+### 💻 Running Locally
 
-Go 1.19 or newer
-
-Run
+Requirements: Go 1.19 or newer
 
 ```Bash
 export APP_IPINFO_TOKEN=your_token
@@ -145,7 +142,6 @@ Prebuilt binaries are available via GitHub Releases for:
 
 Each release includes SHA256 checksums.
 
-## 🧠 Design Principles
 ## 🧠 Design Principles
 
 - No mutexes in the request path
