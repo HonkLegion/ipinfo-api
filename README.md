@@ -109,7 +109,7 @@ server:
   shutdown_timeout: 10s
 
 ipinfo:
-  dump_url: "[https://ipinfo.io/data/ip_ranges.csv.gz](https://ipinfo.io/data/ip_ranges.csv.gz)"
+  dump_url: "https://ipinfo.io/data/ip_ranges.csv.gz"
   token: "DUMMY"
   refresh_interval: 24h
   download_timeout: 60s
