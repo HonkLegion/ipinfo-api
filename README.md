@@ -115,7 +115,8 @@ ipinfo:
   download_timeout: 60s
   cache_file: "./data/ipinfo.csv"
 ```
-Environment Overrides
+
+### Environment Overrides
 
 The IPInfo token can be provided via environment variable:
 
@@ -123,12 +124,13 @@ The IPInfo token can be provided via environment variable:
 APP_IPINFO_TOKEN=your_token_here
 ```
 
-💻 Running Locally
-Requirements
+## 💻 Running Locally
+
+### Requirements
 
 Go 1.19 or newer
 
-Run
+### Run
 
 ```Bash
 export APP_IPINFO_TOKEN=your_token
@@ -137,25 +139,21 @@ go run main.go
 The first startup may take longer due to dataset download and parsing.
 
 ## 📦 Binary Releases
+
 Prebuilt binaries are available via GitHub Releases for:
 
-Linux (amd64, arm64)
-
-macOS (arm64)
+* Linux (amd64, arm64)
+* macOS (arm64)
 
 Each release includes SHA256 checksums.
 
 ## 🧠 Design Principles
-No mutexes in the request path
 
-No allocations during lookups
-
-Immutable datasets
-
-Atomic memory swaps
-
-Disk and memory consistency
-
-Simple failure modes
+* No mutexes in the request path
+* No allocations during lookups
+* Immutable datasets
+* Atomic memory swaps
+* Disk and memory consistency
+* Simple failure modes
 
 This service favors determinism and performance over configurability.
