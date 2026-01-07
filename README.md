@@ -76,19 +76,19 @@ Returns 404 if the IP is not found.
 
 Liveness probe.
 
-Always returns 200 OK
+Always returns 200 OK.
 
-Performs no dataset access
+Performs no dataset access.
 
-Intended for container orchestration and monitoring
+Intended for container orchestration and monitoring.
 
 ### `GET /readyz`
 
 Readiness probe.
 
-Returns 200 OK only when the dataset is loaded
+Returns 200 OK only when the dataset is loaded.
 
-Returns 503 during startup or failed reload
+Returns 503 during startup or failed reload.
 
 ### `POST /reload`
 
@@ -96,9 +96,9 @@ Triggers a dataset reload.
 
 Reload runs asynchronously.
 
-Uses the same logic as periodic refresh
+Uses the same logic as periodic refresh.
 
-Safe to call while the service is running
+Safe to call while the service is running.
 
 ## ⚙️ Configuration
 Configuration is provided via config.yaml.
