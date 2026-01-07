@@ -140,9 +140,8 @@ The first startup may take longer due to dataset download and parsing.
 ## 📦 Binary Releases
 Prebuilt binaries are available via GitHub Releases for:
 
-Linux (amd64, arm64)
-
-macOS (arm64)
+- Linux (amd64, arm64)
+- macOS (arm64)
 
 Each release includes SHA256 checksums.
 
