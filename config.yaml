@@ -7,4 +7,4 @@ ipinfo:
   token: ""
   refresh_interval: 24h
   download_timeout: 30s
-  cache_file: "/app/data/ipinfo.csv"
+  cache_file: "./data/ipinfo.csv"
