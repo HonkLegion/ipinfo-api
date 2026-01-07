@@ -146,16 +146,13 @@ macOS (arm64)
 Each release includes SHA256 checksums.
 
 ## 🧠 Design Principles
-No mutexes in the request path
+## 🧠 Design Principles
 
-No allocations during lookups
-
-Immutable datasets
-
-Atomic memory swaps
-
-Disk and memory consistency
-
-Simple failure modes
+- No mutexes in the request path
+- No allocations during lookups
+- Immutable datasets
+- Atomic memory swaps
+- Disk and memory consistency
+- Simple failure modes
 
 This service favors determinism and performance over configurability.
