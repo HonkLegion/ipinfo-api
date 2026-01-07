@@ -94,7 +94,7 @@ Returns 503 during startup or failed reload
 
 Triggers a dataset reload.
 
-Reload runs asynchronously
+Reload runs asynchronously.
 
 Uses the same logic as periodic refresh
 
