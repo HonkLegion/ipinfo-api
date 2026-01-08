@@ -43,9 +43,9 @@ The service expects an IPInfo CSV dataset with the following columns:
 * `country_code`
 * `continent`
 * `continent_code`
-* `asn` (optional)
-* `as_name` (optional)
-* `as_domain` (optional)
+* `asn` (required, may be empty)
+* `as_name` (required, may be empty)
+* `as_domain` (required, may be empty)
 
 ---
 
@@ -101,18 +101,18 @@ Uses the same logic as periodic refresh.
 Safe to call while the service is running.
 
 ## ⚙️ Configuration
-Configuration is provided via config.yaml.
+Configuration is provided via `config.yaml`.
 
-```YAML
+```yaml
 server:
-  listen: ":8080"
+  listen: ":8090"
   shutdown_timeout: 10s
 
 ipinfo:
-  dump_url: "https://ipinfo.io/data/ip_ranges.csv.gz"
-  token: "DUMMY"
+  dump_url: "https://ipinfo.io/data/ipinfo_lite.csv.gz"
+  token: ""
   refresh_interval: 24h
-  download_timeout: 60s
+  download_timeout: 30s
   cache_file: "./data/ipinfo.csv"
 ```
 
@@ -120,16 +120,16 @@ ipinfo:
 
 The IPInfo token can be provided via environment variable:
 
-```Bash
-APP_IPINFO_TOKEN=your_token_here
+```bash
+HL_APP_IPINFO_TOKEN=your_token_here
 ```
 
 ### 💻 Running Locally
 
-Requirements: Go 1.19 or newer
+Requirements: Go 1.25.5 or newer
 
-```Bash
-export APP_IPINFO_TOKEN=your_token
+```bash
+export HL_APP_IPINFO_TOKEN=your_token
 go run main.go
 ```
 The first startup may take longer due to dataset download and parsing.
