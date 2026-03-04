@@ -171,6 +171,8 @@ Optional repository variable:
 
 - `DOCKERHUB_REPOSITORY` to override the default image name `${DOCKERHUB_USERNAME}/ipinfo-api`
 
+The release workflow uploads binaries and `checksums.txt` to an existing GitHub Release for the pushed tag. It does not create the release entry automatically.
+
 ## 🧠 Design Principles
 
 - No mutexes in the request path

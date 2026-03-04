@@ -119,14 +119,26 @@ jobs:
       # Release
       # -------------------------
 
-      - name: Create GitHub Release
-        uses: softprops/action-gh-release@v2
-        with:
-          tag_name: ${{ steps.vars.outputs.version }}
-          name: Release ${{ steps.vars.outputs.version }}
-          generate_release_notes: true
-          files: |
-            dist/${{ steps.vars.outputs.binary }}-${{ steps.vars.outputs.version }}-linux-amd64
-            dist/${{ steps.vars.outputs.binary }}-${{ steps.vars.outputs.version }}-linux-arm64
-            dist/${{ steps.vars.outputs.binary }}-${{ steps.vars.outputs.version }}-darwin-arm64
-            dist/checksums.txt
+      - name: Check whether GitHub Release exists
+        id: release_check
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if gh release view "${{ steps.vars.outputs.version }}" >/dev/null 2>&1; then
+            echo "exists=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "::warning::GitHub Release for tag '${{ steps.vars.outputs.version }}' does not exist. Skipping asset upload."
+            echo "exists=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Upload assets to existing GitHub Release
+        if: steps.release_check.outputs.exists == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release upload "${{ steps.vars.outputs.version }}" \
+            "dist/${{ steps.vars.outputs.binary }}-${{ steps.vars.outputs.version }}-linux-amd64" \
+            "dist/${{ steps.vars.outputs.binary }}-${{ steps.vars.outputs.version }}-linux-arm64" \
+            "dist/${{ steps.vars.outputs.binary }}-${{ steps.vars.outputs.version }}-darwin-arm64" \
+            "dist/checksums.txt" \
+            --clobber
