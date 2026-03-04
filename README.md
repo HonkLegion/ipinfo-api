@@ -1,17 +1,17 @@
-# IPInfo In-Memory API
+# IPInfo MMDB API
 
-IPInfo In-Memory API is a high-performance **HTTP service written in Go** for IPv4 and IPv6 metadata lookup using the IPInfo offline CSV dataset.
+IPInfo MMDB API is a high-performance **HTTP service written in Go** for IPv4 and IPv6 metadata lookup using the IPInfo offline MMDB dataset.
 
-The service is designed for **read-heavy workloads**, low latency, and predictable behavior. All lookups are performed entirely in memory — no external API calls are made during request handling.
+The service is designed for **read-heavy workloads**, predictable behavior, and a lower memory footprint than the previous CSV materialization approach. All lookups are local to the on-disk MMDB file — no external API calls are made during request handling.
 
 ---
 
 ## 🚀 Key Features
 
 * **IPv4 and IPv6 support**
-* **In-memory lookups only** ($O(\log N)$)
-* **Offline IPInfo CSV dataset** (`.csv.gz`)
-* **Automatic gzip handling**
+* **Offline IPInfo MMDB dataset** (`.mmdb`)
+* **Memory-conservative lookups** via memory-mapped MMDB reader
+* **Automatic gzip handling** for compressed downloads
 * **Atomic dataset reload** (no downtime)
 * **Disk cache** of the last successful dataset
 * **Periodic background refresh**
@@ -24,11 +24,11 @@ The service is designed for **read-heavy workloads**, low latency, and predictab
 
 ## 🛠 How It Works
 
-1. The IPInfo dataset is downloaded as a compressed CSV file.
-2. The file is decompressed and parsed.
-3. Parsed data is stored in optimized in-memory structures.
-4. Lookups are performed using **binary search**.
-5. Dataset reloads replace the in-memory data atomically.
+1. The IPInfo dataset is downloaded as an MMDB file.
+2. The downloaded file is validated by opening it as a MaxMind DB.
+3. The validated file is atomically swapped into the local disk cache.
+4. Lookups are performed directly against the MMDB reader.
+5. Dataset reloads atomically replace the active MMDB reader.
 
 > **Note:** During normal operation, **no network calls** are made.
 
@@ -36,7 +36,7 @@ The service is designed for **read-heavy workloads**, low latency, and predictab
 
 ## 📊 Dataset Format
 
-The service expects an IPInfo CSV dataset with the following columns:
+The service expects an IPInfo MMDB dataset exposing the following fields:
 
 * `network` (CIDR, IPv4 or IPv6)
 * `country`
@@ -109,11 +109,11 @@ server:
   shutdown_timeout: 10s
 
 ipinfo:
-  dump_url: "https://ipinfo.io/data/ipinfo_lite.csv.gz"
+  dump_url: "https://ipinfo.io/data/ipinfo_lite.mmdb"
   token: ""
   refresh_interval: 24h
   download_timeout: 30s
-  cache_file: "./data/ipinfo.csv"
+  cache_file: "./data/ipinfo.mmdb"
 ```
 
 ### Environment Overrides
@@ -132,7 +132,7 @@ Requirements: Go 1.25.5 or newer
 export HL_APP_IPINFO_TOKEN=your_token
 go run app.go
 ```
-The first startup may take longer due to dataset download and parsing.
+The first startup may take longer due to dataset download and MMDB validation.
 
 ## 📦 Binary Releases
 Prebuilt binaries are available via GitHub Releases for:
@@ -176,9 +176,8 @@ The release workflow uploads binaries and `checksums.txt` to an existing GitHub 
 ## 🧠 Design Principles
 
 - No mutexes in the request path
-- No allocations during lookups
-- Immutable datasets
-- Atomic memory swaps
+- Immutable on-disk datasets
+- Atomic reader swaps
 - Disk and memory consistency
 - Simple failure modes
 
