@@ -130,7 +130,7 @@ Requirements: Go 1.25.5 or newer
 
 ```bash
 export HL_APP_IPINFO_TOKEN=your_token
-go run main.go
+go run app.go
 ```
 The first startup may take longer due to dataset download and parsing.
 
@@ -141,6 +141,35 @@ Prebuilt binaries are available via GitHub Releases for:
 - macOS (arm64)
 
 Each release includes SHA256 checksums.
+
+## 🐳 Docker Releases
+
+Tagged releases also publish a multi-platform Docker image to Docker Hub for:
+
+- Linux (amd64, arm64)
+
+Docker images cannot target `darwin/arm64`; macOS support is provided via the standalone binary release above.
+
+Stable release tags publish these Docker tags:
+
+- `x.y.z`
+- `x.y`
+- `x`
+- `latest`
+- `sha-<commit>`
+
+Pre-release or test tags such as `v1.2.3-rc1` or `v1.2.3-test` publish the exact version tag plus `sha-<commit>` and do not update `latest`.
+
+### GitHub Actions configuration
+
+Set these repository secrets before creating a release tag:
+
+- `DOCKERHUB_USERNAME`
+- `DOCKERHUB_TOKEN`
+
+Optional repository variable:
+
+- `DOCKERHUB_REPOSITORY` to override the default image name `${DOCKERHUB_USERNAME}/ipinfo-api`
 
 ## 🧠 Design Principles
 

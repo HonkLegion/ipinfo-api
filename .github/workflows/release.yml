@@ -1,4 +1,4 @@
-name: Release binaries
+name: Release binaries and Docker image
 
 on:
   push:
@@ -10,8 +10,10 @@ permissions:
 
 jobs:
   build:
-    name: Build and release
+    name: Build, release, and publish Docker image
     runs-on: ubuntu-latest
+    env:
+      DOCKERHUB_IMAGE: ${{ vars.DOCKERHUB_REPOSITORY || format('{0}/{1}', secrets.DOCKERHUB_USERNAME, github.event.repository.name) }}
 
     steps:
       - name: Checkout source
@@ -22,12 +24,42 @@ jobs:
         with:
           go-version: "1.25"
 
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
       - name: Prepare variables
         id: vars
         run: |
           VERSION=${GITHUB_REF#refs/tags/}
           echo "version=$VERSION" >> $GITHUB_OUTPUT
           echo "binary=ipinfo-api" >> $GITHUB_OUTPUT
+          if [[ "$VERSION" == *-* ]]; then
+            echo "is_stable=false" >> $GITHUB_OUTPUT
+          else
+            echo "is_stable=true" >> $GITHUB_OUTPUT
+          fi
+          if [[ "$VERSION" == v0.* ]]; then
+            echo "is_major_zero=true" >> $GITHUB_OUTPUT
+          else
+            echo "is_major_zero=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Generate Docker metadata
+        id: docker_meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.DOCKERHUB_IMAGE }}
+          flavor: |
+            latest=false
+          tags: |
+            type=semver,pattern={{version}},value=${{ steps.vars.outputs.version }}
+            type=semver,pattern={{major}}.{{minor}},value=${{ steps.vars.outputs.version }}
+            type=semver,pattern={{major}},value=${{ steps.vars.outputs.version }},enable=${{ steps.vars.outputs.is_stable == 'true' && steps.vars.outputs.is_major_zero != 'true' }}
+            type=raw,value=latest,enable=${{ steps.vars.outputs.is_stable == 'true' }}
+            type=sha,prefix=sha-
 
       - name: Create dist directory
         run: mkdir -p dist
@@ -66,6 +98,22 @@ jobs:
         run: |
           cd dist
           sha256sum * > checksums.txt
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Build and push multi-platform Docker image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: ./Dockerfile
+          platforms: linux/amd64,linux/arm64
+          push: true
+          tags: ${{ steps.docker_meta.outputs.tags }}
+          labels: ${{ steps.docker_meta.outputs.labels }}
 
       # -------------------------
       # Release
